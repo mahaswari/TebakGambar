@@ -271,20 +271,43 @@
         function updateDisplay() {
             const quizData = JSON.parse(localStorage.getItem('quizData') || '{}');
             const participants = JSON.parse(localStorage.getItem('participants') || '[]');
-            const currentSoalIdx = localStorage.getItem('currentSoalIdx') || 0;
+            const currentSoalIdx = parseInt(localStorage.getItem('currentSoalIdx') || 0, 10);
 
             // Update Soal
-            fetch('soal.json').then(res => res.json()).then(data => {
-                const s = data[currentSoalIdx];
-                if (s) {
-                    document.getElementById('soal-num').innerText = `Soal #${s.id}`;
-                    document.getElementById('quiz-img').src = s.gambar;
-                    correctAnswer = s.jawaban; // Simpan jawaban benar
-                    document.getElementById('options-container').innerHTML = s.opsi.map((o, i) =>
-                        `<div class="opt" data-answer="${String.fromCharCode(65 + i)}">${String.fromCharCode(65 + i)}. ${o}</div>`
-                    ).join('');
-                }
-            });
+            fetch('soal.json')
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data) || data.length === 0) {
+                        console.error('Data soal tidak valid');
+                        return;
+                    }
+                    // Validasi index - jika melampaui, reset ke 0
+                    let validIdx = currentSoalIdx;
+                    if (currentSoalIdx >= data.length) {
+                        console.error(`Soal pada index ${currentSoalIdx} tidak ditemukan. Total soal: ${data.length}`);
+                        validIdx = 0;
+                        localStorage.setItem('currentSoalIdx', 0);
+                    }
+                    const s = data[validIdx];
+                    if (s) {
+                        document.getElementById('soal-num').innerText = `Soal #${s.id}`;
+                        document.getElementById('quiz-img').src = s.gambar;
+                        correctAnswer = s.jawaban; // Simpan jawaban benar
+                        document.getElementById('options-container').innerHTML = s.opsi.map((o, i) =>
+                            `<div class="opt" data-answer="${String.fromCharCode(65 + i)}">${String.fromCharCode(65 + i)}. ${o}</div>`
+                        ).join('');
+                    } else {
+                        console.error(`Soal pada index ${validIdx} tidak ditemukan`);
+                        document.getElementById('options-container').innerHTML = '<p style="color:red;">Error: Soal tidak valid. Silakan refresh halaman.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading soal.json:', error);
+                    document.getElementById('options-container').innerHTML = '<p style="color:red;">Error: Gagal memuat soal. Pastikan soal.json ada di folder yang sama.</p>';
+                });
 
             // Update Chart
             const chart = document.getElementById('chart-container');

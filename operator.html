@@ -124,11 +124,23 @@
         }
 
         function nextSoal() {
-            currentSoalIdx++;
-            localStorage.setItem('currentSoalIdx', currentSoalIdx);
-            localStorage.setItem('timerValue', document.getElementById('input-timer').value);
-            localStorage.setItem('triggerNext', Date.now()); // Trigger storage event
-            alert("Soal dilanjutkan!");
+            fetch('soal.json')
+                .then(res => res.json())
+                .then(data => {
+                    if (currentSoalIdx + 1 < data.length) {
+                        currentSoalIdx++;
+                        localStorage.setItem('currentSoalIdx', currentSoalIdx);
+                        localStorage.setItem('timerValue', document.getElementById('input-timer').value);
+                        localStorage.setItem('triggerNext', Date.now());
+                        alert("Soal dilanjutkan!");
+                    } else {
+                        alert(`Soal hanya ada ${data.length}. Resetkan untuk mulai dari awal.`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error: Gagal memuat soal.json');
+                });
         }
 
         function resetAll() {
