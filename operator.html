@@ -83,6 +83,16 @@
         let participants = JSON.parse(localStorage.getItem('participants') || '[]');
         let currentSoalIdx = parseInt(localStorage.getItem('currentSoalIdx') || 0);
 
+        // Simpan nilai timer default saat halaman dimuat
+        if (!localStorage.getItem('timerValue')) {
+            localStorage.setItem('timerValue', document.getElementById('input-timer').value);
+        }
+
+        // Update timer value saat input berubah
+        document.getElementById('input-timer').addEventListener('input', function () {
+            localStorage.setItem('timerValue', this.value);
+        });
+
         function renderControls() {
             const container = document.getElementById('operator-controls');
             const step = parseInt(document.getElementById('input-step').value) || 10;
