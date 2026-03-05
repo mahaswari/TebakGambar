@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Operator - Control Panel</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #222;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .card {
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .danger {
+            background: #dc3545;
+        }
+
+        .score-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #555;
+            padding: 10px 0;
+        }
+
+        .label-p {
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: #ffc107;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h3>Konfigurasi Quiz</h3>
+        <input type="number" id="input-timer" placeholder="Detik Timer (cth: 30)" value="30">
+        <input type="number" id="input-step" placeholder="Step Score" value="10">
+        <input type="number" id="input-penalty" placeholder="Pengurangan Poin (cth: 5)" value="5">
+        <button onclick="nextSoal()">Next Soal & Reset Timer</button>
+    </div>
+
+    <div class="card">
+        <h3>Tambah Peserta</h3>
+        <input type="text" id="p-name" placeholder="Nama Peserta">
+        <button onclick="addParticipant()">Tambah</button>
+        <button class="danger" onclick="resetAll()">Reset Semua Data</button>
+    </div>
+
+    <div id="operator-controls">
+    </div>
+
+    <script>
+        let participants = JSON.parse(localStorage.getItem('participants') || '[]');
+        let currentSoalIdx = parseInt(localStorage.getItem('currentSoalIdx') || 0);
+
+        function renderControls() {
+            const container = document.getElementById('operator-controls');
+            const step = parseInt(document.getElementById('input-step').value) || 10;
+            const penalty = parseInt(document.getElementById('input-penalty').value) || 5;
+
+            container.innerHTML = '<h3>Kontrol Skor</h3>' + participants.map((p, index) => `
+            <div class="score-control">
+                <div class="label-p">${p.name}</div>
+                <button onclick="changeScore(${index}, ${step})">+ ${step}</button>
+                <button class="danger" onclick="changeScore(${index}, -${penalty})">- ${penalty}</button>
+                <span>Skor: ${p.score}</span>
+                <button class="warning" onclick="deleteParticipant(${index})" style="margin-left: auto;">Hapus</button>
+            </div>
+        `).join('');
+
+            localStorage.setItem('participants', JSON.stringify(participants));
+        }
+
+        function addParticipant() {
+            const name = document.getElementById('p-name').value;
+            if (name) {
+                participants.push({ name: name, score: 0 });
+                document.getElementById('p-name').value = '';
+                renderControls();
+            }
+        }
+
+        function changeScore(index, amount) {
+            participants[index].score += amount;
+            if (participants[index].score < 0) participants[index].score = 0;
+            renderControls();
+        }
+
+        function deleteParticipant(index) {
+            if (confirm(`Hapus peserta "${participants[index].name}"?`)) {
+                participants.splice(index, 1);
+                renderControls();
+            }
+        }
+
+        function nextSoal() {
+            currentSoalIdx++;
+            localStorage.setItem('currentSoalIdx', currentSoalIdx);
+            localStorage.setItem('timerValue', document.getElementById('input-timer').value);
+            localStorage.setItem('triggerNext', Date.now()); // Trigger storage event
+            alert("Soal dilanjutkan!");
+        }
+
+        function resetAll() {
+            if (confirm("Hapus semua data?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        renderControls();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "gambar": "1.jpg",
+        "opsi": [
+            "Gajah",
+            "Jerapah",
+            "Singa",
+            "Kucing"
+        ],
+        "jawaban": "A"
+    },
+    {
+        "id": 2,
+        "gambar": "2.jpg",
+        "opsi": [
+            "Apel",
+            "Jeruk",
+            "Mangga",
+            "Pisang"
+        ],
+        "jawaban": "C"
+    },
+    {
+        "id": 3,
+        "gambar": "3.jpg",
+        "opsi": [
+            "Cokaiba",
+            "Jeruk",
+            "Mangga",
+            "Pisang"
+        ],
+        "jawaban": "A"
+    },
+    {
+        "id": 4,
+        "gambar": "4.jpg",
+        "opsi": [
+            "Apel",
+            "Jeruk",
+            "Halua Kanari",
+            "Pisang"
+        ],
+        "jawaban": "C"
+    }
+]
