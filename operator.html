@@ -56,6 +56,11 @@
             background: #ffc107;
             color: #333;
         }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -67,6 +72,8 @@
         <input type="number" id="input-step" placeholder="Step Score" value="10">
         <input type="number" id="input-penalty" placeholder="Pengurangan Poin (cth: 5)" value="5">
         <button onclick="nextSoal()">Next Soal & Reset Timer</button>
+        <button class="warning" id="show-answer-btn" onclick="showAnswer()"
+            style="margin-left: 10px; color: #333; font-weight: bold;">Tampilkan Jawaban</button>
     </div>
 
     <div class="card">
@@ -134,6 +141,8 @@
         }
 
         function nextSoal() {
+            localStorage.removeItem('showAnswer');
+            document.getElementById('show-answer-btn').disabled = false;
             fetch('soal.json')
                 .then(res => res.json())
                 .then(data => {
@@ -158,6 +167,12 @@
                 localStorage.clear();
                 location.reload();
             }
+        }
+
+        function showAnswer() {
+            localStorage.setItem('showAnswer', 'true');
+            localStorage.setItem('showAnswerTrigger', Date.now());
+            document.getElementById('show-answer-btn').disabled = true;
         }
 
         renderControls();

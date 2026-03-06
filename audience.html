@@ -137,7 +137,6 @@
             border-color: #28a745;
             color: #28a745;
             box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-            animation: pulse 0.6s ease-in-out;
         }
 
         @keyframes pulse {
@@ -304,6 +303,10 @@
                         document.getElementById('options-container').innerHTML = s.opsi.map((o, i) =>
                             `<div class="opt" data-answer="${String.fromCharCode(65 + i)}">${String.fromCharCode(65 + i)}. ${o}</div>`
                         ).join('');
+                        // if operator already requested answer before question loaded, reveal now
+                        if (localStorage.getItem('showAnswer') === 'true') {
+                            revealCorrectAnswer();
+                        }
                     } else {
                         console.error(`Soal pada index ${validIdx} tidak ditemukan`);
                         document.getElementById('options-container').innerHTML = '<p style="color:red;">Error: Soal tidak valid. Silakan refresh halaman.</p>';
@@ -356,7 +359,6 @@
                         ring.currentTime = 0;
                         ring.play().catch(() => { });
                     }
-                    revealCorrectAnswer();
                     return;
                 }
                 time--;
@@ -380,7 +382,14 @@
         window.addEventListener('storage', (e) => {
             if (e.key === 'triggerNext') {
                 hideIntroScreen();
+                // Clear any previous reveals when moving on
+                document.querySelectorAll('.opt.correct').forEach(el => {
+                    el.classList.remove('correct');
+                });
                 startTimer();
+            }
+            if ((e.key === 'showAnswer' || e.key === 'showAnswerTrigger') && localStorage.getItem('showAnswer') === 'true') {
+                revealCorrectAnswer();
             }
             updateDisplay();
         });
