@@ -250,6 +250,11 @@
         <source src="10sec_sound.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- sound effect to play when the timer has just expired -->
+    <audio id="ring-sound">
+        <source src="ringing_sound.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         let timerInterval;
         let correctAnswer = null;
@@ -345,6 +350,12 @@
                     clearInterval(timerInterval);
                     timerSound.pause();
                     soundPlaying = false;
+                    // play ringing effect exactly when time runs out
+                    const ring = document.getElementById('ring-sound');
+                    if (ring) {
+                        ring.currentTime = 0;
+                        ring.play().catch(() => { });
+                    }
                     revealCorrectAnswer();
                     return;
                 }
